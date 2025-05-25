@@ -11,7 +11,6 @@ import SettingsPage from "./pages/SettingsPage";
 import ProfilePage from "./pages/ProfilePage";
 import { Toaster } from "react-hot-toast";
 import AddCustomerPage from "./pages/AddCustomerPage";
-import TopSellersPage from "./pages/TopSellersPAge";
 import PaidCustomers from "./pages/TopSellersPAge";
 import LoanStatusPage from "./pages/LoanStatusPAge";
 

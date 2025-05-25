@@ -13,7 +13,6 @@ const HomePage = () => {
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
-
   const handleSearch = async (event) => {
     event.preventDefault();
     setIsSearching(true);
@@ -59,7 +58,7 @@ const HomePage = () => {
       )}
 
       {/* Add Customer and Search */}
-      <div className="w-full flex justify-center space-x-4 mb-8 mt-8">
+      <div className="w-full flex justify-center space-x-4 mb-8 mt-10">
         <Link to="/add-customer">
           <button className="btn btn-accent w-full md:w-48 text-white rounded-lg shadow-lg hover:bg-accent-focus transition-all ease-in-out duration-200">
             Add Customer
@@ -127,7 +126,6 @@ const HomePage = () => {
         ))}
       </div>
 
-      {/* Check Loan Status Button */}
       <div className="w-full max-w-xs mt-8 flex justify-center">
         <Link to="/check-loan-status">
           <button className="btn btn-primary w-full text-white rounded-lg shadow-lg hover:bg-primary-focus transition-all">
@@ -138,5 +136,4 @@ const HomePage = () => {
     </div>
   );
 };
-
 export default HomePage;

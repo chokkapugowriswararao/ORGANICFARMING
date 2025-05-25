@@ -207,38 +207,25 @@ router.get('/paid', protectRoute, async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-// Search Customers by Email
+// Search Customers by ID
 router.get('/search', protectRoute, async (req, res) => {
-  const { email, customerId } = req.query; // Getting email and customerId from query parameters
-  
-  // If neither email nor customerId is provided, return an error
-  if (!email && !customerId) {
-    return res.status(400).json({ message: 'Please provide either email or customerId' });
+  const { customerId } = req.query; // Getting customerId from query parameters
+
+  // If customerId is not provided, return an error
+  if (!customerId) {
+    return res.status(400).json({ message: 'Please provide customerId' });
   }
 
   const userId = req.user._id; 
 
   try {
-    if (email) {
-      const customer = await Customer.findOne({ email, userId });
+    const customer = await Customer.findOne({ _id: customerId, userId });
 
-      if (!customer) {
-        return res.status(404).json({ message: 'Customer not found by email' });
-      }
-
-      return res.json(customer);
+    if (!customer) {
+      return res.status(404).json({ message: 'Customer not found by customerId' });
     }
 
-    if (customerId) {
-      const customer = await Customer.findOne({ _id: customerId, userId });
-
-      if (!customer) {
-        return res.status(404).json({ message: 'Customer not found by customerId' });
-      }
-
-      return res.json(customer);
-    }
-
+    return res.json(customer);
   } catch (error) {
     console.error('Error fetching customer:', error);
     res.status(500).json({ message: 'Server error' });
@@ -310,6 +297,56 @@ router.put('/update-loan-status/:customerId', async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Customer Login (no auth needed)
+router.post('/login', async (req, res) => {
+  try {
+    const { email, customerId } = req.body;
+
+    if (!email || !customerId) {
+      return res.status(400).json({ message: 'Email and Customer ID are required' });
+    }
+
+    const customer = await Customer.findOne({ _id: customerId, email });
+
+    if (!customer) {
+      return res.status(404).json({ message: 'Customer not found' });
+    }
+
+    // You can choose what data to send back, here sending full customer
+    res.status(200).json({
+      message: 'Login successful',
+      customer,
+    });
+  } catch (error) {
+    console.error('Customer login failed:', error);
+    res.status(500).json({ message: 'Wrong cusomerId or Email' });
+  }
+});
+// Get customer details (requires auth)
+router.get('/details/:customerId', protectRoute, async (req, res) => {
+  try {
+    const { customerId } = req.params;
+    const { email } = req.query;
+
+    if (!email) {
+      return res.status(400).json({ message: 'Email query param is required' });
+    }
+
+    const userId = req.user._id; // from protectRoute middleware
+
+    const customer = await Customer.findOne({ _id: customerId, email, userId });
+
+    if (!customer) {
+      return res.status(404).json({ message: 'Customer not found' });
+    }
+
+    res.status(200).json({ customer });
+  } catch (error) {
+    console.error('Error fetching customer details:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 
