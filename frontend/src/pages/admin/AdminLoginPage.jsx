@@ -18,18 +18,16 @@ const AdminLoginPage = () => {
       const response = await axios.post("/api/auth/admin-login", {
         email,
         password,
-      });
-
-      console.log('Admin logged in:', response.data);
+      }, {withCredentials: true});
 
       toast.success("Admin login successful!", {
         duration: 2000,
       });
 
       // Redirect after toast
-      setTimeout(() => {
+      
         navigate("/admin/dashboard");
-      }, 1500);
+      
 
     } catch (err) {
       console.error(err);

@@ -32,7 +32,7 @@ const AddCustomerPage = () => {
     setMessage(''); 
 
     try {
-      const response = await axios.post('api/customers/add', formData, {
+      const response = await axios.post('/api/customers/add', formData, {
         withCredentials: true,
       });
 

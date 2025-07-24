@@ -12,7 +12,7 @@ const AdminCustomerPage = () => {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const res = await axios.get("api/customers/all", {
+        const res = await axios.get("/api/customers/all", {
           withCredentials: true,
         });
 
@@ -50,7 +50,7 @@ const AdminCustomerPage = () => {
   const handleSave = async () => {
     try {
       const res = await axios.put(
-        `api/customers/update/${editCustomerId}`,
+        `/api/customers/update/${editCustomerId}`,
         {
           ...editedCustomer,
           addWasteRecord: true, // ✅ Important to push to wasteRecords

@@ -27,7 +27,7 @@ const HomePage = () => {
       }
 
       const response = await axios.get(
-        `api/customers/search/${searchQuery}`,
+        `/api/customers/search/${searchQuery}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

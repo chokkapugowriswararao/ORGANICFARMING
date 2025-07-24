@@ -15,7 +15,7 @@ const LoanStatusPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.get(`api/customers/loan-status/${customerId}`, {
+      const response = await axios.get(`/api/customers/loan-status/${customerId}`, {
         withCredentials: true,
       });
 

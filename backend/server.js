@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.route.js";
 import customerRoutes from "./routes/customer.route.js";
-import mongoose from "mongoose";
+import { connectDB } from "./lib/db.js";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -17,14 +17,10 @@ const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
 app.use(cors({
-  origin: "http://localhost:5173", 
+  origin: "*", 
   credentials: true
 }));
 app.use(cookieParser());
-
-mongoose.connect(process.env.MONGO_URI )
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.log('MongoDB connection error:', err));
 
 // Use the routes
 app.use("/api/auth", authRoutes);
@@ -36,5 +32,6 @@ app.get("/*", (req, res) => {
 });
 
 app.listen(PORT, () => {
+  connectDB();
   console.log("Server is running on port: " + PORT);
 });

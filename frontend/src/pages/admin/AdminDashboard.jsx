@@ -12,10 +12,9 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchAdmin = async () => {
       try {
-        const res = await axios.get("api/auth/check", {
+        const res = await axios.get("/api/auth/check", {
           withCredentials: true,
         });
-
         if (res.data && res.data.isAdmin) {
           setAdmin(res.data);
         } else {
@@ -31,7 +30,7 @@ const AdminDashboard = () => {
     };
 
     fetchAdmin();
-  }, [navigate]);
+  }, []);
 
   if (loading) {
     return (

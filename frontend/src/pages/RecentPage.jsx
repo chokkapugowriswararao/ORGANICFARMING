@@ -12,7 +12,7 @@ const RecentCustomers = () => {
   const fetchCustomers = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('api/customers/recent', {
+      const response = await axios.get('/api/customers/recent', {
         withCredentials: true,
       });
       setCustomers(response.data);
