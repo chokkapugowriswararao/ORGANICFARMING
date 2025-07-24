@@ -50,7 +50,7 @@ const AdminCustomerPage = () => {
   const handleSave = async () => {
     try {
       const res = await axios.put(
-        `http://localhost:5000/api/customers/update/${editCustomerId}`,
+        `api/customers/update/${editCustomerId}`,
         {
           ...editedCustomer,
           addWasteRecord: true, // ✅ Important to push to wasteRecords
