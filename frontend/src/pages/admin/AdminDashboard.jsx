@@ -12,7 +12,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchAdmin = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/auth/check", {
+        const res = await axios.get("api/auth/check", {
           withCredentials: true,
         });
 
@@ -81,7 +81,7 @@ const AdminDashboard = () => {
           <div
             className="bg-gradient-to-r from-red-400 to-pink-500 text-white p-6 rounded-xl shadow-md cursor-pointer hover:scale-105 transition-all"
             onClick={async () => {
-              await axios.post("http://localhost:5000/api/auth/logout", {}, {
+              await axios.post("api/auth/logout", {}, {
                 withCredentials: true,
               });
               toast.success("Logged out successfully");

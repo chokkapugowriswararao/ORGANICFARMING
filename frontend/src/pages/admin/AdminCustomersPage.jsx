@@ -12,7 +12,7 @@ const AdminCustomerPage = () => {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/customers/all", {
+        const res = await axios.get("api/customers/all", {
           withCredentials: true,
         });
 

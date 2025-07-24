@@ -10,10 +10,10 @@ const AdminUsersPage = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const pendingRes = await axios.get("http://localhost:5000/api/auth/pending-users", {
+        const pendingRes = await axios.get("api/auth/pending-users", {
           withCredentials: true,
         });
-        const approvedRes = await axios.get("http://localhost:5000/api/auth/approved-users", {
+        const approvedRes = await axios.get("api/auth/approved-users", {
           withCredentials: true,
         });
 
@@ -33,7 +33,7 @@ const AdminUsersPage = () => {
   const handleApprove = async (userId) => {
   try {
     await axios.put(
-      `http://localhost:5000/api/auth/approve-user/${userId}`,
+      `api/auth/approve-user/${userId}`,
       { approve: true }, // ✅ SEND approve: true here
       { withCredentials: true }
     );
