@@ -29,10 +29,10 @@ const AddCustomerPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true); // Set loading state to true
-    setMessage(''); // Reset any previous messages
+    setMessage(''); 
 
     try {
-      const response = await axios.post('http://localhost:5000/api/customers/add', formData, {
+      const response = await axios.post('api/customers/add', formData, {
         withCredentials: true,
       });
 

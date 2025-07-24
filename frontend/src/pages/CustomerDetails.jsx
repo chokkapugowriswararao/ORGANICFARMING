@@ -25,7 +25,7 @@ const CustomerDetails = () => {
       try {
         // Make authenticated request to your backend API
         const response = await axios.get(
-          `http://localhost:5000/api/customers/details/${customerId}?email=${encodeURIComponent(email)}`,
+          `api/customers/details/${customerId}?email=${encodeURIComponent(email)}`,
           {
             // Include auth token if needed (adjust according to your auth setup)
             headers: {

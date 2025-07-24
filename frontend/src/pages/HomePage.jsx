@@ -27,7 +27,7 @@ const HomePage = () => {
       }
 
       const response = await axios.get(
-        `http://localhost:5000/api/customers/search/${searchQuery}`,
+        `api/customers/search/${searchQuery}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -110,10 +110,10 @@ const HomePage = () => {
 
       {/* Loan Options */}
       <div className="w-full flex flex-wrap justify-center gap-8 mt-12 mb-8">
-        {[{ type: 'Sheep Loan', icon: '/public/download.jpg' },
-          { type: 'Poultry Loan', icon: '/public/images.jpg' },
-          { type: 'Cattle Loan', icon: '/public/images (1).jpg' },
-          { type: 'Crop Loan', icon: '/public/images (2).jpg' },
+        {[{ type: 'Sheep Loan', icon: '/download.jpg' },
+          { type: 'Poultry Loan', icon: '/images.jpg' },
+          { type: 'Cattle Loan', icon: '/images (1).jpg' },
+          { type: 'Crop Loan', icon: '/images (2).jpg' },
         ].map((loan) => (
           <div
             key={loan.type}

@@ -1,9 +1,8 @@
 import express from 'express';
 import Customer from '../models/customer.model.js';
 import { protectRoute } from '../middleware/auth.middleware.js'; 
-
+import { isAdmin } from "../middleware/isAdmin.js"
 const router = express.Router();
-
 
 router.post('/add', protectRoute, async (req, res) => {
   try {
@@ -22,7 +21,6 @@ router.post('/add', protectRoute, async (req, res) => {
 
     const userId = req.user._id;
 
-    // Validate required fields
     if (!name || !email || !phoneNumber || henwaste === undefined || cattlewaste === undefined || sheepwaste === undefined) {
       return res.status(400).json({ message: 'All fields are required' });
     }
@@ -44,7 +42,6 @@ router.post('/add', protectRoute, async (req, res) => {
     let customer = await Customer.findOne({ email, userId });
 
     if (customer) {
-      // Update existing customer
       customer.wasteRecords.push({
         henwaste: henwasteNum,
         cattlewaste: cattlewasteNum,
@@ -66,9 +63,10 @@ router.post('/add', protectRoute, async (req, res) => {
       customer.loanProvided = loanProvided;
       customer.loanApprovedDate = loanApprovedDate;
 
+      customer.lastModifiedBy = userId;
+
       await customer.save();
     } else {
-      // Create new customer
       customer = new Customer({
         name,
         email,
@@ -90,6 +88,8 @@ router.post('/add', protectRoute, async (req, res) => {
           sheepwaste: sheepwasteNum,
           neemPlantation: neemPlantationNum,
         }],
+        // ✅ Set initial modifier to creator
+        lastModifiedBy: userId,
       });
 
       await customer.save();
@@ -98,9 +98,10 @@ router.post('/add', protectRoute, async (req, res) => {
     res.status(200).json(customer);
   } catch (error) {
     console.error('Error adding customer:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: 'Customer already added by Other user' });
   }
 });
+
 
 
 // Update Payment Status
@@ -349,5 +350,92 @@ router.get('/details/:customerId', protectRoute, async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+// Update customer info
+router.put('/update/:customerId', protectRoute, async (req, res) => {
+  try {
+    const { customerId } = req.params;
+    const userId = req.user._id;
+
+    const {
+      name,
+      email,
+      phoneNumber,
+      henwaste,
+      cattlewaste,
+      sheepwaste,
+      neemPlantation,
+      loanProvided,
+      loanApprovedDate,
+      pendingPayment,
+      pendingPaymentAmount,
+      addWasteRecord // ✅ Optional flag to add wasteRecord entry
+    } = req.body;
+
+    const customer = await Customer.findById(customerId);
+    if (!customer) {
+      return res.status(404).json({ message: 'Customer not found' });
+    }
+
+    // Update base fields if present
+    if (name) customer.name = name;
+    if (email) customer.email = email;
+    if (phoneNumber) customer.phoneNumber = phoneNumber;
+    if (loanProvided !== undefined) customer.loanProvided = loanProvided;
+    if (loanApprovedDate) customer.loanApprovedDate = loanApprovedDate;
+
+if (pendingPayment !== undefined) {
+  customer.pendingPayment = pendingPayment;
+
+  if (pendingPayment === false) {
+    customer.pendingPaymentAmount = 0;
+    customer.loanProvided = 0;
+    customer.loanApprovedDate = null;
+  } else if (pendingPayment === true && pendingPaymentAmount !== undefined) {
+    customer.pendingPaymentAmount = pendingPaymentAmount;
+    customer.loanProvided = pendingPaymentAmount;
+  }
+}
+    if (henwaste !== undefined) customer.henwaste = Number(henwaste);
+    if (cattlewaste !== undefined) customer.cattlewaste = Number(cattlewaste);
+    if (sheepwaste !== undefined) customer.sheepwaste = Number(sheepwaste);
+    if (neemPlantation !== undefined) customer.neemPlantation = Number(neemPlantation);
+
+    // Optionally push to wasteRecords
+    if (addWasteRecord) {
+      const wasteRecord = {
+        henwaste: Number(henwaste) || 0,
+        cattlewaste: Number(cattlewaste) || 0,
+        sheepwaste: Number(sheepwaste) || 0,
+        neemPlantation: Number(neemPlantation) || 0,
+        dateAdded: new Date()
+      };
+      customer.wasteRecords.push(wasteRecord);
+    }
+
+    customer.lastModifiedBy = userId;
+    await customer.save();
+
+    res.status(200).json({ message: 'Customer updated successfully', customer });
+
+  } catch (error) {
+    console.error('Error updating customer:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.get("/all", protectRoute, isAdmin, async (req, res) => {
+  try {
+    const customers = await Customer.find()
+      .populate("userId", "fullName email") // optional: show user who added
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(customers);
+  } catch (error) {
+    console.error("Error fetching all customers:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 
 export default router;
+

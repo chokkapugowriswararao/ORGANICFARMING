@@ -126,7 +126,7 @@ const CustomerLoginForm = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/api/customers/login", {
+      const response = await axios.post("api/customers/login", {
         email: custEmail,
         customerId: custId,
       });

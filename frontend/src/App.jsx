@@ -9,10 +9,15 @@ import SignUpPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
 import SettingsPage from "./pages/SettingsPage";
 import ProfilePage from "./pages/ProfilePage";
-import { Toaster } from "react-hot-toast";
 import AddCustomerPage from "./pages/AddCustomerPage";
 import PaidCustomers from "./pages/TopSellersPAge";
 import LoanStatusPage from "./pages/LoanStatusPAge";
+import AdminLoginPage from "./pages/admin/AdminLoginPage";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+
+import { Toaster } from "react-hot-toast";
+import AdminCustomerPage from "./pages/admin/AdminCustomersPage";
+import AdminUsersPage from "./pages/admin/AdminUsersPage";
 
 const App = () => {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
@@ -34,36 +39,24 @@ const App = () => {
       <div data-theme={theme}>
         <Navbar />
         <Routes>
-          <Route
-            path="/"
-            element={authUser ? <HomePage /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/signup"
-            element={!authUser ? <SignUpPage /> : <Navigate to="/" />}
-          />
-          <Route
-            path="/login"
-            element={!authUser ? <LoginPage /> : <Navigate to="/" />}
-          />
+          <Route path="/" element={authUser ? <HomePage /> : <Navigate to="/login" />} />
+          <Route path="/signup" element={ <SignUpPage />} />
+          <Route path="/login" element={!authUser ? <LoginPage /> : <Navigate to="/" />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/profile" element={authUser ? <ProfilePage /> : <Navigate to="/login" />} />
+          <Route path="/add-customer" element={authUser ? <AddCustomerPage /> : <Navigate to="/login" />} />
+          <Route path="/paid" element={authUser ? <PaidCustomers /> : <Navigate to="/login" />} />
+          <Route path="/check-loan-status" element={authUser ? <LoanStatusPage /> : <Navigate to="/login" />} />
+
+         
+          <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route
-            path="/profile"
-            element={authUser ? <ProfilePage /> : <Navigate to="/login" />}
-          />
-         <Route
-  path="/add-customer"
-  element={authUser ? <AddCustomerPage /> : <Navigate to="/login" />}
-/>
-<Route
-  path="/paid"
-  element={authUser ? <PaidCustomers /> : <Navigate to="/login" />}
-/>
-<Route
-  path="/check-loan-status" 
-  element={authUser ? <LoanStatusPage /> : <Navigate to="/login" />}
+  path="/admin/customers"
+  element={<AdminCustomerPage />}
 />
 
+<Route path="/admin/users" element={<AdminUsersPage />} />
         </Routes>
 
         <Toaster />
