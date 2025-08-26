@@ -5,7 +5,6 @@ import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare } from "lucide-react";
 import axios from "axios";
 
 import { useAuthStore } from "../store/useAuthStore";
-
 const EmployerLoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -18,7 +17,6 @@ const EmployerLoginForm = () => {
     e.preventDefault();
     login(formData);
   };
-
   return (
     <div className="flex flex-col justify-center items-center w-full max-w-md px-4">
       <div className="w-full space-y-6">
@@ -50,7 +48,6 @@ const EmployerLoginForm = () => {
               />
             </div>
           </div>
-
           <div>
             <label className="block font-medium mb-1">Password</label>
             <div className="relative">

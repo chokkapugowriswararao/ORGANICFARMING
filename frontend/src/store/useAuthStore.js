@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import toast from "react-hot-toast";
-import { axiosInstance } from "../lib/axios.js";
 
 export const useAuthStore = create((set) => ({
   authUser: null,
@@ -11,7 +10,7 @@ export const useAuthStore = create((set) => ({
   onlineUsers: [],
 checkAuth: async () => {
   try {
-    const res = await axiosInstance.get("/auth/check", {
+    const res = await axios.get("/api/auth/check", {
       withCredentials: true,
     });
 
@@ -34,7 +33,7 @@ checkAuth: async () => {
   signup: async (data) => {
     set({ isSigningUp: true });
     try {
-      await axiosInstance.post("/auth/signup", data);
+      await axios.post("/api/auth/signup", data);
       toast.success("Account created! Awaiting admin approval.");
       // ✅ Do NOT set authUser or navigate
     } catch (error) {
@@ -47,7 +46,7 @@ checkAuth: async () => {
   login: async (data) => {
     set({ isLoggingIn: true });
     try {
-      const res = await axiosInstance.post("/auth/login", data);
+      const res = await axios.post("/api/auth/login", data);
 
       if (!res.data.isApproved) {
         toast.error("Your account is awaiting admin approval.");
@@ -66,7 +65,7 @@ checkAuth: async () => {
   updateProfile: async (data) => {
     set({ isUpdatingProfile: true });
     try {
-      const res = await axiosInstance.put("/auth/update-profile", data);
+      const res = await axios.put("/api/auth/update-profile", data);
       set({ authUser: res.data });
       toast.success("Profile updated successfully");
     } catch (error) {
@@ -79,7 +78,7 @@ checkAuth: async () => {
 
   logout: async () => {
     try {
-      await axiosInstance.post("/auth/logout");
+      await axios.post("/api/auth/logout");
       set({ authUser: null });
       toast.success("Logged out successfully");
     } catch (error) {
