@@ -34,7 +34,7 @@ const AddCustomerPage = () => {
     try {
       // 🔑 Send request to backend (update baseURL here if needed)
       const response = await axios.post(
-        'api/customers/add',
+        '/api/customers/add',
         formData,
         { withCredentials: true }
       );
