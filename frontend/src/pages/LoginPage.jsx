@@ -29,8 +29,8 @@ const EmployerLoginForm = () => {
             >
               <MessageSquare className="w-6 h-6 text-primary" />
             </div>
-            <h1 className="text-2xl font-bold mt-2">Welcome Back</h1>
-            <p className="text-base-content/70">Sign in to your account</p>
+            <h1 className="text-2xl font-bold mt-2">SAFE FARMING</h1>
+            <p className="text-base-content/70">EMPLOYEE LOGIN</p>
           </div>
         </div>
 
