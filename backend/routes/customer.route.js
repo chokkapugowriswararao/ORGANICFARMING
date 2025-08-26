@@ -14,9 +14,7 @@ router.post('/add', protectRoute, async (req, res) => {
       cattlewaste,
       sheepwaste,
       neemPlantation,
-      pendingPayment,
       loanProvided,
-      loanApprovedDate,
     } = req.body;
 
     const userId = req.user._id;
@@ -29,11 +27,10 @@ router.post('/add', protectRoute, async (req, res) => {
     const cattlewasteNum = Number(cattlewaste);
     const sheepwasteNum = Number(sheepwaste);
     const neemPlantationNum = Number(neemPlantation) || 0;
-
-    const henwasteRate = 10;
-    const cattlewasteRate = 15;
-    const sheepwasteRate = 12;
-
+    const henwasteRate = 300;
+    const cattlewasteRate = 600;
+    const sheepwasteRate = 800;
+    
     const henwasteCost = henwasteNum * henwasteRate;
     const cattlewasteCost = cattlewasteNum * cattlewasteRate;
     const sheepwasteCost = sheepwasteNum * sheepwasteRate;
@@ -41,7 +38,13 @@ router.post('/add', protectRoute, async (req, res) => {
 
     let customer = await Customer.findOne({ email, userId });
 
+    // If customer exists, check loan condition
     if (customer) {
+      // Check if previous loan exists
+      if (loanProvided > 0 && customer.loanProvided > 0) {
+        return res.status(400).json({ message: 'Cannot provide loan: previous loan pending' });
+      }
+
       customer.wasteRecords.push({
         henwaste: henwasteNum,
         cattlewaste: cattlewasteNum,
@@ -60,13 +63,17 @@ router.post('/add', protectRoute, async (req, res) => {
 
       customer.pendingPayment = true;
 
-      customer.loanProvided = loanProvided;
-      customer.loanApprovedDate = loanApprovedDate;
+      // If loan is provided, set loanApprovedDate to today
+      if (loanProvided > 0) {
+        customer.loanProvided = loanProvided;
+        customer.loanApprovedDate = new Date();
+      }
 
       customer.lastModifiedBy = userId;
 
       await customer.save();
     } else {
+      // New customer
       customer = new Customer({
         name,
         email,
@@ -78,8 +85,8 @@ router.post('/add', protectRoute, async (req, res) => {
         neemPlantation: neemPlantationNum,
         pendingPayment: true,
         pendingPaymentAmount: newWasteCost,
-        loanProvided,
-        loanApprovedDate,
+        loanProvided: loanProvided > 0 ? loanProvided : 0,
+        loanApprovedDate: loanProvided > 0 ? new Date() : null,
         totalPaid: [],
         totalAmountPaid: 0,
         wasteRecords: [{
@@ -88,7 +95,6 @@ router.post('/add', protectRoute, async (req, res) => {
           sheepwaste: sheepwasteNum,
           neemPlantation: neemPlantationNum,
         }],
-        // ✅ Set initial modifier to creator
         lastModifiedBy: userId,
       });
 
@@ -98,12 +104,9 @@ router.post('/add', protectRoute, async (req, res) => {
     res.status(200).json(customer);
   } catch (error) {
     console.error('Error adding customer:', error);
-    res.status(500).json({ message: 'Customer already added by Other user' });
+    res.status(500).json({ message: 'Customer already added by another user or internal error' });
   }
 });
-
-
-
 // Update Payment Status
 router.put('/pay/:customerId', protectRoute, async (req, res) => {
   const { customerId } = req.params;
@@ -155,10 +158,8 @@ router.put('/pay/:customerId', protectRoute, async (req, res) => {
       }}
     );
 
-    // Log the result of the update operation
     console.log('Customer after update:', updatedCustomer);
 
-    // Fetch and return the updated customer from the database
     const finalCustomer = await Customer.findById(customerId);
     res.status(200).json(finalCustomer);
   } catch (error) {
@@ -435,7 +436,108 @@ router.get("/all", protectRoute, isAdmin, async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+router.put('/apply-loan/:customerId', async (req, res) => {
+  try {
+    const { customerId } = req.params;
+    const { loanType, loanAmount, bankName, accountNo } = req.body;
 
+    if (!loanType || !loanAmount || loanAmount <= 0) {
+      return res.status(400).json({ message: 'Valid loan type and amount are required' });
+    }
+
+    const customer = await Customer.findById(customerId);
+    if (!customer) return res.status(404).json({ message: 'Customer not found' });
+
+    // Block if any pending loan
+    if (customer.hasPendingLoan) {
+      return res.status(400).json({ message: 'Pending loan exists. Cannot apply new loan.' });
+    }
+
+    // Select the proper loan array
+    let loanArray;
+    switch (loanType.toLowerCase()) {
+      case 'sheep': loanArray = customer.sheepLoans; break;
+      case 'cattle': loanArray = customer.cattleLoans; break;
+      case 'farm': loanArray = customer.farmLoans; break;
+      case 'poultry': loanArray = customer.poultryLoans; break;
+      default: return res.status(400).json({ message: 'Invalid loan type' });
+    }
+
+    // Add new loan
+    loanArray.push({
+      amount: loanAmount,
+      status: 'pending',
+      approvedDate: new Date(),
+      bankName,
+      accountNo
+    });
+
+    // Set pending flag
+    customer.hasPendingLoan = true;
+
+    await customer.save();
+
+    res.status(200).json({
+      message: `${loanType} loan of ${loanAmount} applied successfully.`,
+      customer
+    });
+
+  } catch (error) {
+    console.error('Error applying loan:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+router.put('/pay-loan/:customerId/:loanType', async (req, res) => {
+  try {
+    const { customerId, loanType } = req.params;
+
+    const customer = await Customer.findById(customerId);
+    if (!customer) return res.status(404).json({ message: 'Customer not found' });
+
+    // Select loan array
+    let loanArray;
+    switch (loanType.toLowerCase()) {
+      case 'sheep': loanArray = customer.sheepLoans; break;
+      case 'cattle': loanArray = customer.cattleLoans; break;
+      case 'farm': loanArray = customer.farmLoans; break;
+      case 'poultry': loanArray = customer.poultryLoans; break;
+      default: return res.status(400).json({ message: 'Invalid loan type' });
+    }
+
+    if (loanArray.length === 0 || loanArray[loanArray.length - 1].status !== 'pending') {
+      return res.status(400).json({ message: `No pending ${loanType} loan found` });
+    }
+
+    const pendingLoan = loanArray[loanArray.length - 1];
+
+    // Add to customer payments
+    customer.totalPaid.push({
+      date: new Date(),
+      amount: pendingLoan.amount
+    });
+
+    customer.totalAmountPaid += pendingLoan.amount;
+
+    // Mark loan as paid
+    pendingLoan.status = 'paid';
+
+    // Recalculate hasPendingLoan flag
+    customer.hasPendingLoan = [
+      ...customer.sheepLoans,
+      ...customer.cattleLoans,
+      ...customer.farmLoans,
+      ...customer.poultryLoans
+    ].some(loan => loan.status === 'pending');
+
+    await customer.save();
+
+    res.status(200).json({ message: `${loanType} loan paid successfully.`, customer });
+
+  } catch (error) {
+    console.error('Error paying loan:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 export default router;
 

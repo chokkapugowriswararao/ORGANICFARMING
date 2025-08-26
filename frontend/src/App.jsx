@@ -18,6 +18,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import { Toaster } from "react-hot-toast";
 import AdminCustomerPage from "./pages/admin/AdminCustomersPage";
 import AdminUsersPage from "./pages/admin/AdminUsersPage";
+import LoanProviderPage from "./pages/LoanProviderForm";
 
 const App = () => {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
@@ -46,9 +47,10 @@ const App = () => {
           <Route path="/profile" element={authUser ? <ProfilePage /> : <Navigate to="/login" />} />
           <Route path="/add-customer" element={authUser ? <AddCustomerPage /> : <Navigate to="/login" />} />
           <Route path="/paid" element={authUser ? <PaidCustomers /> : <Navigate to="/login" />} />
+          <Route path="/loan-provider/:customerId/:loanType" element={<LoanProviderPage />} />
           <Route path="/check-loan-status" element={authUser ? <LoanStatusPage /> : <Navigate to="/login" />} />
 
-         
+    
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route
@@ -57,6 +59,7 @@ const App = () => {
 />
 
 <Route path="/admin/users" element={<AdminUsersPage />} />
+
         </Routes>
 
         <Toaster />

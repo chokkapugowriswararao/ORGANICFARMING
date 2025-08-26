@@ -32,7 +32,6 @@ const customerSchema = new mongoose.Schema(
     loanProvided: { type: Number, default: 0 },
     loanApprovedDate: { type: Date },
 
-    // New loan types
     sheeploan: { type: Number, default: 0 },
     cattleloan: { type: Number, default: 0 },
     farmLoan: { type: Number, default: 0 },
