@@ -10,24 +10,20 @@ const HomePage = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [isSearching, setIsSearching] = useState(false);
 
-  // Static waste costs
   const [wasteCosts] = useState({
-    henwasteCost: 300,      // ₹
-    cattlewasteCost: 600,   // ₹
-    sheepwasteCost: 800,    // ₹
-    neemPlantationCost: 900 // ₹
+    henwasteCost: 300,     
+    cattlewasteCost: 600,   
+    sheepwasteCost: 800,    
+    neemPlantationCost: 900 
   });
-
   const navigate = useNavigate();
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
-  };
-
+};
   const handleSearch = async (event) => {
     event.preventDefault();
     setIsSearching(true);
-
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -36,12 +32,10 @@ const HomePage = () => {
         setIsSearching(false);
         return;
       }
-
       const response = await axios.get(
         `/api/customers/search/${searchQuery}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
       setSearchResults(response.data);
       setErrorMessage('');
     } catch (error) {
@@ -57,18 +51,15 @@ const HomePage = () => {
       setIsSearching(false);
     }
   };
-
   const handleLoanClick = (loanType) => {
     navigate(`/loan/${loanType}`);
   };
-
   const loans = [
     { type: 'Sheep Loan', icon: '/download.jpg' },
     { type: 'Poultry Loan', icon: '/images.jpg' },
     { type: 'Cattle Loan', icon: '/images (1).jpg' },
     { type: 'Crop Loan', icon: '/images (2).jpg' },
   ];
-
   return (
     <div className="min-h-screen bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 flex flex-col items-center justify-start p-8">
       {isSearching && (

@@ -18,7 +18,6 @@ const LoanStatusPage = () => {
       const response = await axios.get(`/api/customers/loan-status/${customerId}`, {
         withCredentials: true,
       });
-
       // Check the loan status and details returned from backend
       setLoanStatus(response.data.loanStatus);
       setLoanAmountWithInterest(response.data.loanAmountWithInterest);

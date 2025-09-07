@@ -10,7 +10,6 @@ export const signup = async (req, res) => {
     if (!fullName || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
-
     if (password.length < 6) {
       return res.status(400).json({ message: "Password must be at least 6 characters" });
     } 
@@ -20,13 +19,11 @@ export const signup = async (req, res) => {
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-
     const newUser = new User({
       fullName: fullName,
       email,
       password: hashedPassword,
     });
-
     await newUser.save();
     generateToken(newUser._id, res);
     
@@ -41,7 +38,6 @@ export const signup = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -60,7 +56,6 @@ export const login = async (req, res) => {
     if (!user.isApproved) {
       return res.status(403).json({ message: "Your account is awaiting admin approval." });
     }
-
     generateToken(user._id, res);
 
     res.status(200).json({
@@ -69,7 +64,6 @@ export const login = async (req, res) => {
       email: user.email,
       profilePic: user.profilePic,
       isApproved: user.isApproved, // ✅ FIXED
-
     });
   } catch (error) {
     console.log("error in login controller", error.message);
