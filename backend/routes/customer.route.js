@@ -14,11 +14,15 @@ router.post('/add', protectRoute, async (req, res) => {
       cattlewaste,
       sheepwaste,
       neemPlantation,
-      loanProvided,
+      loanRequested, // Yes/No
+      loanType,      // hen, cattle, sheep, neem
+      loanQuantity,  // number of items
+      loanAmount,    // calculated amount
     } = req.body;
 
     const userId = req.user._id;
 
+    // Validate required fields
     if (!name || !email || !phoneNumber || henwaste === undefined || cattlewaste === undefined || sheepwaste === undefined) {
       return res.status(400).json({ message: 'All fields are required' });
     }
@@ -27,24 +31,25 @@ router.post('/add', protectRoute, async (req, res) => {
     const cattlewasteNum = Number(cattlewaste);
     const sheepwasteNum = Number(sheepwaste);
     const neemPlantationNum = Number(neemPlantation) || 0;
-    const henwasteRate = 300;
-    const cattlewasteRate = 600;
-    const sheepwasteRate = 800;
-    
-    const henwasteCost = henwasteNum * henwasteRate;
-    const cattlewasteCost = cattlewasteNum * cattlewasteRate;
-    const sheepwasteCost = sheepwasteNum * sheepwasteRate;
+
+    const henwasteCost = henwasteNum * 300;
+    const cattlewasteCost = cattlewasteNum * 600;
+    const sheepwasteCost = sheepwasteNum * 800;
     const newWasteCost = henwasteCost + cattlewasteCost + sheepwasteCost;
 
     let customer = await Customer.findOne({ email, userId });
 
-    // If customer exists, check loan condition
+    // Convert loan amount to number
+    const loanAmountNum = Number(loanAmount) || 0;
+
+    // If customer exists
     if (customer) {
       // Check if previous loan exists
-      if (loanProvided > 0 && customer.loanProvided > 0) {
+      if (loanAmountNum > 0 && customer.loanProvided > 0) {
         return res.status(400).json({ message: 'Cannot provide loan: previous loan pending' });
       }
 
+      // Add new waste record
       customer.wasteRecords.push({
         henwaste: henwasteNum,
         cattlewaste: cattlewasteNum,
@@ -52,20 +57,24 @@ router.post('/add', protectRoute, async (req, res) => {
         neemPlantation: neemPlantationNum,
       });
 
+      // Update cumulative waste
       customer.henwaste += henwasteNum;
       customer.cattlewaste += cattlewasteNum;
       customer.sheepwaste += sheepwasteNum;
       customer.neemPlantation += neemPlantationNum;
 
+      // Update pending payment
       customer.pendingPaymentAmount = customer.pendingPayment
         ? customer.pendingPaymentAmount + newWasteCost
         : newWasteCost;
 
       customer.pendingPayment = true;
 
-      // If loan is provided, set loanApprovedDate to today
-      if (loanProvided > 0) {
-        customer.loanProvided = loanProvided;
+      // Update loan if provided
+      if (loanAmountNum > 0) {
+        customer.loanProvided = loanAmountNum;
+        customer.loanType = loanType;
+        customer.loanQuantity = Number(loanQuantity);
         customer.loanApprovedDate = new Date();
       }
 
@@ -85,8 +94,10 @@ router.post('/add', protectRoute, async (req, res) => {
         neemPlantation: neemPlantationNum,
         pendingPayment: true,
         pendingPaymentAmount: newWasteCost,
-        loanProvided: loanProvided > 0 ? loanProvided : 0,
-        loanApprovedDate: loanProvided > 0 ? new Date() : null,
+        loanProvided: loanAmountNum > 0 ? loanAmountNum : 0,
+        loanType: loanAmountNum > 0 ? loanType : null,
+        loanQuantity: loanAmountNum > 0 ? Number(loanQuantity) : 0,
+        loanApprovedDate: loanAmountNum > 0 ? new Date() : null,
         totalPaid: [],
         totalAmountPaid: 0,
         wasteRecords: [{

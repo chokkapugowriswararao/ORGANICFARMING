@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import axios from 'axios';
+import { toast } from 'react-hot-toast';
 import RecentCustomers from './RecentPage';
 import PaidCustomers from './TopSellersPAge';
 
@@ -11,16 +12,18 @@ const HomePage = () => {
   const [isSearching, setIsSearching] = useState(false);
 
   const [wasteCosts] = useState({
-    henwasteCost: 300,     
-    cattlewasteCost: 600,   
-    sheepwasteCost: 800,    
-    neemPlantationCost: 900 
+    henwasteCost: 300,
+    cattlewasteCost: 600,
+    sheepwasteCost: 800,
+    neemPlantationCost: 900,
   });
+
   const navigate = useNavigate();
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
-};
+  };
+
   const handleSearch = async (event) => {
     event.preventDefault();
     setIsSearching(true);
@@ -51,15 +54,25 @@ const HomePage = () => {
       setIsSearching(false);
     }
   };
+
   const handleLoanClick = (loanType) => {
-    navigate(`/loan/${loanType}`);
+    // Show warning for 5 seconds
+    toast(
+      'If you need a loan, you must enter some waste alongside.',
+      { duration: 5000, style: { background: '#f87171', color: 'white' } }
+    );
+
+    // Redirect to Add Customer page
+    navigate('/add-customer');
   };
+
   const loans = [
     { type: 'Sheep Loan', icon: '/download.jpg' },
     { type: 'Poultry Loan', icon: '/images.jpg' },
     { type: 'Cattle Loan', icon: '/images (1).jpg' },
     { type: 'Crop Loan', icon: '/images (2).jpg' },
   ];
+
   return (
     <div className="min-h-screen bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 flex flex-col items-center justify-start p-8">
       {isSearching && (
@@ -74,20 +87,20 @@ const HomePage = () => {
           </button>
         </Link>
         <div className="relative w-full max-w-xs">
-          <input
+          {/* <input
             type="text"
             placeholder="Search by phone or email"
             className="input input-bordered w-full py-3 px-4 rounded-lg text-black focus:ring-2 focus:ring-indigo-300 transition-all"
             value={searchQuery}
             onChange={handleSearchChange}
             onFocus={() => setIsSearching(true)}
-          />
-          <button
+          /> */}
+          {/* <button
             className="absolute top-0 right-0 btn btn-primary text-white rounded-lg px-4 py-2"
             onClick={handleSearch}
           >
             Search
-          </button>
+          </button> */}
         </div>
       </div>
 
