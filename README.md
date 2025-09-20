@@ -1,4 +1,4 @@
-The Sustainable Organic Farming Platform is designed to promote eco-friendly farming practices while addressing the issue of agricultural waste. The platform enables farmers to connect with brokers, who help in collecting and channeling farm waste towards recycling, composting, or biofuel production. This not only reduces environmental pollution but also provides an additional source of income to farmers.
+The Sustainable Organic Farming Platform is designed to promote eco-friendly farming practices while addressing the issue of agricultural waste. The platform enables farmers to connect with brokers, who help in collecting and channeling farm waste towards recycling, composting,Organic fertilizers and biofuel production. This not only reduces environmental pollution but also provides an additional source of income to farmers.
 
 🚀 Features
 
